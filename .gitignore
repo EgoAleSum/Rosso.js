@@ -1,0 +1,17 @@
+# OSX
+**/*.DS_Store
+.AppleDouble
+**/._*
+
+
+# Node
+node_modules/
+logs
+*.log
+pids
+*.pid
+*.seed
+lib-cov
+coverage
+.grunt
+

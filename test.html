@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Rosso.js test</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript">
+/*// Performs actions when the DOM is ready
+$(document).ready(function() {
+	// Resumes initial state (for example, after loading
+	// from an URL or a bookmark)
+	$("#loc").html(hManager.getHash());
+	
+	// Initializes the history manager
+	hManager.init(function(query){
+		$("#loc").html(query);
+	});
+});*/
+</script>
+</head>
+
+<body>
+<p>Location: <span id="loc">&nbsp;</span></p>
+<p><a href="#/test1">Test 1</a></p>
+<p><a href="#/test2">Test 2</a></p>
+<p><a href="#/test3">Test 3</a></p>
+<p><a href="#/test4">Test 4</a></p>
+<p><button onclick="hManager.push('test5')">Test 5</button></p>
+
+<div id="main"></div>
+
+<!-- view/home -->
+<script type="text/rosso-view" id="view/home">
+<h2>Home view</h2>
+</script>
+
+<script type="text/javascript" src="Rosso.dist.js"></script>
+<script type="text/javascript" src="testviews/home.js"></script>
+<script type="text/javascript" src="testviews/test.js"></script>
+<script type="text/javascript">
+Rosso({container: 'main'})
+</script>
+
+</body>
+</html>

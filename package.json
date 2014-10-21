@@ -1,0 +1,17 @@
+{
+  "name": "rosso",
+  "description": "Minimal client-side JS framework",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Alessandro Segala (http://github.com/egoalesum)",
+  "contributors": [
+    "TJ Holowaychuk (https://github.com/tj)"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/EgoAleSum/Rosso.js.git"
+  },
+  "devDependencies": {
+    "path-to-regexp": "1.x"
+  }
+}
