@@ -5,6 +5,8 @@
  License: MIT
 */
 
+'use strict';
+
 /**
  * Initialize a new "request" `Context`
  * with the given `path` and optional initial `state`.
@@ -17,14 +19,23 @@ function Context(path) {
 	var i = path.indexOf('?')
 	
 	this.path = path
-	this.title = document.title
 	this.querystring = (i !== -1)
 		? path.slice(i + 1)
 		: ''
 	this.pathname = (i !== -1)
 		? path.slice(0, i)
 		: path
+	
 	this.params = []
+	
+	this.querystringParams = {}
+	if(this.querystring) {
+		var allKV = this.querystring.split('&')
+		for(var e in allKV) {
+			var parts = allKV[e].split('=').map(decodeURIComponent)
+			this.querystringParams[parts[0]] = parts[1]
+		}
+	}
 }
 
 module.exports = Context

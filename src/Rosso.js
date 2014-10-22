@@ -5,6 +5,8 @@
  License: MIT
 */
 
+'use strict';
+
 var Route = require('./Route.js')
 var Context = require('./Context.js')
 
@@ -17,6 +19,8 @@ var running = false
 var options = {
 	container: ''
 }
+
+var currentPage = false
 
 /**
  * Register `path` with callback `fn()`,
@@ -123,6 +127,11 @@ Rosso.getPath = function() {
  */
 
 Rosso.show = function(path) {
+	if(currentPage) {
+		Rosso.unloadPage(currentPage)
+		currentPage = false
+	}
+	
 	var i = 0
 	if(!path) path = ''
 	
@@ -136,35 +145,49 @@ Rosso.show = function(path) {
 	next()
 }
 
+Rosso.push = function(path) {
+	window.location.hash = "#"+path
+}
+
+Rosso.pop = function() {
+	window.history.back()
+}
+
 Rosso.loadPage = function(args, ctx, next) {
-	console.log(args)
-	
 	if(args.view && options.container) {
+		var destinationEl = document.getElementById(options.container)
+		
 		// View is a string with the id of an element
-	    if(typeof args.view == 'string' && args.view[0] == '#') {
-	    	console.log('View: ', args.view.substr(1))
-	    	var contents = document.getElementById(args.view.substr(1)).innerHTML
-	    	document.getElementById(options.container).innerHTML = contents
-	    }
-	    // Load a file
-	    else if(typeof args.view == 'string') {
-	    }
-	    else if(typeof args.view == 'function') {
-	    	var contents = args.view(ctx)
-	    	document.getElementById(options.container).innerHTML = contents
-	    }
+		if(typeof args.view == 'string' && args.view[0] == '#') {
+			var sourceEl = document.getElementById(args.view.substr(1))
+			if(sourceEl && destinationEl) {
+				var contents = sourceEl.innerHTML
+				destinationEl.innerHTML = contents
+			}
+		}
+		else if(typeof args.view == 'function') {
+			var contents = args.view(ctx)
+			if(destinationEl) {
+				destinationEl.innerHTML = contents
+			}
+		}
 	}
 	
 	if(args.init) {
-	    args.init(ctx, next)
+		args.init(ctx, next)
 	}
 	else {
 		if(next) next()
 	}
 }
 
+Rosso.unloadPage = function(args) {
+	if(args.deinit) {
+		args.destroy()
+	}
+}
+
 function locationHashChanged() {
-	console.log('Hash changed: ', Rosso.getPath())
 	Rosso.show(Rosso.getPath())
 }
 

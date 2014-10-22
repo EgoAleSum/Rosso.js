@@ -6,11 +6,12 @@
 		init: function(ctx, next) {
 			// Manipulate DOM, setup actions, register callbacks, etc
 			console.log('Init /home', ctx, !!next)
+			document.title = 'Home'
 			next()
 		},
-		deinit: function() {
+		destroy: function() {
 			// Unregister all callbacks, etc
-			console.log('Deinit /home')
+			console.log('Destroy /home')
 		},
 		testmethod: function(sender) {
 			console.log('testmethod caled by: '+sender.id)

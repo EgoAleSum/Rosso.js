@@ -8,11 +8,12 @@
 		init: function(ctx, next) {
 			// Manipulate DOM, setup actions, register callbacks, etc
 			console.log('Init /test', ctx, !!next)
+			document.title = 'Some test route'
 			next()
 		},
-		deinit: function() {
+		destroy: function() {
 			// Unregister all callbacks, etc
-			console.log('Deinit /test')
+			console.log('Destroy /test')
 		}
 	})
 })();
