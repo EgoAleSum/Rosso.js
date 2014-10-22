@@ -454,7 +454,7 @@ Rosso.loadPage = function(args, ctx, next) {
  */
 
 Rosso.unloadPage = function(args) {
-	if(args.deinit) {
+	if(args.destroy) {
 		args.destroy()
 	}
 }
