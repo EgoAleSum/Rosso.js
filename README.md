@@ -1,4 +1,5 @@
 # Rosso.js
+[![Dependency Status](https://david-dm.org/EgoAleSum/Rosso.js.png)](https://david-dm.org/EgoAleSum/Rosso.js)
 
 Minimal client-side JS framework.
 

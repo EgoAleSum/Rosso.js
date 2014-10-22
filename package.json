@@ -13,5 +13,13 @@
   },
   "dependencies": {
     "path-to-regexp": "1.x"
+  },
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-browserify": "*",
+    "grunt-contrib-clean": "*"
   }
 }
