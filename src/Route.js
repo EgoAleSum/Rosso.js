@@ -11,16 +11,16 @@
 * Module dependencies.
 */
 
-var pathtoRegexp = require('path-to-regexp')
+var pathToRegexp = require('path-to-regexp')
 
 /**
- * Initialize `Route` with the given HTTP `path`,
- * and an array of `callbacks` and `options`.
+ * Initialize `Route` with the given HTTP `path`
+ * and `options`.
  *
- * Options:
+ * Options (see also https://github.com/pillarjs/path-to-regexp#usage ):
  *
- *		  - `sensitive`		enable case-sensitive routes
- *		  - `strict`				 enable strict matching for trailing slashes
+ *		  - `sensitive`		enable case-sensitive routes [false]
+ *		  - `strict`		enable strict matching for trailing slashes [false]
  *
  * @param {String} path
  * @param {Object} options.
@@ -29,7 +29,7 @@ var pathtoRegexp = require('path-to-regexp')
 function Route(path, options) {
 	options = options || {}
 	this.path = (path === '*') ? '(.*)' : path
-	this.regexp = pathtoRegexp(this.path,
+	this.regexp = pathToRegexp(this.path,
 		this.keys = [],
 		options.sensitive,
 		options.strict)
@@ -67,12 +67,12 @@ Route.prototype.match = function(path, params) {
 		? path.slice(0, qsIndex)
 		: path
 	var m = this.regexp.exec(decodeURIComponent(pathname))
-
+	
 	if(!m) return false
-
+	
 	for(var i = 1, len = m.length; i < len; ++i) {
 		var key = keys[i - 1]
-
+		
 		var val = (typeof m[i] == 'string')
 			? decodeURIComponent(m[i])
 			: m[i]
@@ -86,8 +86,12 @@ Route.prototype.match = function(path, params) {
 			params.push(val)
 		}
 	}
-
+	
 	return true
 }
+
+/**
+ * Expose Route
+ */
 
 module.exports = Route

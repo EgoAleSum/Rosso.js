@@ -8,11 +8,10 @@
 'use strict';
 
 /**
- * Initialize a new "request" `Context`
- * with the given `path` and optional initial `state`.
+ * Initialize a new `Context`
+ * with the given `path`.
  *
  * @param {String} path
- * @param {Object} state
  */
 
 function Context(path) {
@@ -38,4 +37,8 @@ function Context(path) {
 	}
 }
 
-module.exports = Context
+/**
+ * Expose Context
+ */
+
+if(module) module.exports = Context

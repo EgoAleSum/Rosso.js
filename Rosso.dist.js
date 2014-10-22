@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"/Users/Alessandro/Desktop/Rosso.js/node_modules/path-to-regexp/index.js":[function(require,module,exports){
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /**
  * Expose `pathtoRegexp`.
  */
@@ -167,7 +167,7 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{}],"/Users/Alessandro/Desktop/Rosso.js/src/Context.js":[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -178,11 +178,10 @@ function pathtoRegexp (path, keys, options) {
 'use strict';
 
 /**
- * Initialize a new "request" `Context`
- * with the given `path` and optional initial `state`.
+ * Initialize a new `Context`
+ * with the given `path`.
  *
  * @param {String} path
- * @param {Object} state
  */
 
 function Context(path) {
@@ -208,9 +207,13 @@ function Context(path) {
 	}
 }
 
-module.exports = Context
+/**
+ * Expose Context
+ */
 
-},{}],"/Users/Alessandro/Desktop/Rosso.js/src/Rosso.js":[function(require,module,exports){
+if(module) module.exports = Context
+
+},{}],3:[function(require,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -220,42 +223,45 @@ module.exports = Context
 
 'use strict';
 
+/**
+ * Require dependencies with browserify.
+ */
 var Route = require('./Route.js')
 var Context = require('./Context.js')
 
 /**
  * Running flag.
  */
-
 var running = false
 
+/**
+ * Default options for Rosso.js.
+ */
 var options = {
 	container: ''
 }
 
+/**
+ * Holds the `args` object for the current page.
+ */
 var currentPage = false
 
 /**
- * Register `path` with callback `fn()`,
- * or route `path`, or `Rosso.init()`.
+ * Register `path` with `args`,
+ * or show page `path`, or `Rosso.init([options])`.
  *
- *		  Rosso(fn)
- *		  Rosso('*', fn)
- *		  Rosso('/user/:id', load)
- *		  Rosso('/user/' + user.id, { some: 'thing' })
- *		  Rosso('/user/' + user.id)
+ *		  Rosso('*', args)
+ *		  Rosso('/user/:id', args)
+ *		  Rosso('/list/')
  *		  Rosso()
+ *		  Rosso(options)
  *
  * @param {String|Object} path
  * @param {Object} args...
+ * @api public
  */
 
 function Rosso(path, args) {
-	// <callback>
-	if('function' == typeof path) {
-		return Rosso('*', path)
-	}
-
 	// route <path> to <callback ...>
 	if(typeof args == 'object') {
 		var newRoute = new Route(path)
@@ -263,22 +269,14 @@ function Rosso(path, args) {
 			Rosso.loadPage(args, ctx, next)
 		}))
 	}
-	// show <path> with [state]
+	// show <path>
 	else if(typeof path == 'string') {
 		Rosso.show(path)
 	}
-	// init [options]
+	// init with [options]
 	else {
 		Rosso.init(path)
 	}
-}
-
-Rosso.setOption = function(name, value) {
-	options[name] = value
-}
-
-Rosso.getOption = function(name) {
-	return options[name]
 }
 
 /**
@@ -288,15 +286,38 @@ Rosso.getOption = function(name) {
 Rosso.callbacks = []
 
 /**
- * Bind with the given `options`.
+ * Set `value` for option `name`.
+ *
+ * @param {String} name
+ * @param {String} value
+ * @api public
+ */
+ 
+Rosso.setOption = function(name, value) {
+	options[name] = value
+}
+
+/**
+ * Return the value for option `name`.
+ *
+ * @param {String} name
+ * @return {String}
+ * @api public
+ */
+
+Rosso.getOption = function(name) {
+	return options[name]
+}
+
+/**
+ * Initialize Rosso.js listener with `opts`.
  *
  * Options:
  *
- *		  - `click` bind to click events [true]
- *		  - `popstate` bind to popstate [true]
- *		  - `dispatch` perform initial dispatch [true]
+ *		  - `container` id of the container object where to display views, or empty to disable ['']
  *
- * @param {Object} options
+ * @param {Object} opts
+ * @api public
  */
 
 Rosso.init = function(opts) {
@@ -307,7 +328,7 @@ Rosso.init = function(opts) {
 	if(!running) {
 		running = true
 		window.addEventListener('hashchange', locationHashChanged, false)
-		// Force the callback when page loads
+		// Force the callback when first init (normally at page load)
 		locationHashChanged()
 	}
 }
@@ -315,6 +336,7 @@ Rosso.init = function(opts) {
 /**
  * Unbind hashchange event handler.
  *
+ * @api public
  */
 
 Rosso.deinit = function() {
@@ -322,21 +344,33 @@ Rosso.deinit = function() {
 	window.removeEventListener('hashchange', locationHashChanged, false)
 }
 
-Rosso.getPath = function() {
-	if(window.location.href.indexOf('#') > -1)
-	{
-		var parts = window.location.href.split('#')
-		return parts[parts.length - 1]
-	}
-	return ''
+/**
+ * Push a new `path` into the history stack.
+ *
+ * @param {String} path
+ * @api public
+ */
+
+Rosso.push = function(path) {
+	window.location.hash = "#"+path
 }
 
 /**
- * Show `path` with optional `state` object.
+ * Pop the history stack.
+ *
+ * @api public
+ */
+
+Rosso.pop = function() {
+	window.history.back()
+}
+
+/**
+ * Show `path`.
  *
  * @param {String} path
- * @param {Object} state
  * @return {Context}
+ * @api private
  */
 
 Rosso.show = function(path) {
@@ -354,17 +388,35 @@ Rosso.show = function(path) {
 		if(!fn) return
 		fn(ctx, next)
 	}
-
 	next()
+	
+	return ctx
 }
 
-Rosso.push = function(path) {
-	window.location.hash = "#"+path
+/**
+ * Get current path.
+ *
+ * @return {String}
+ * @api private
+ */
+
+Rosso.getPath = function() {
+	if(window.location.href.indexOf('#') > -1)
+	{
+		var parts = window.location.href.split('#')
+		return parts[parts.length - 1]
+	}
+	return ''
 }
 
-Rosso.pop = function() {
-	window.history.back()
-}
+/**
+ * Load a page: initialize it and show the view.
+ *
+ * @param {Object} args
+ * @param {Context} ctx
+ * @param {Function} next
+ * @api private
+ */
 
 Rosso.loadPage = function(args, ctx, next) {
 	if(args.view && options.container) {
@@ -394,20 +446,35 @@ Rosso.loadPage = function(args, ctx, next) {
 	}
 }
 
+/**
+ * Unload a page.
+ *
+ * @param {Object} args
+ * @api private
+ */
+
 Rosso.unloadPage = function(args) {
 	if(args.deinit) {
 		args.destroy()
 	}
 }
 
+/**
+ * Handle hashchange events.
+ */
+
 function locationHashChanged() {
 	Rosso.show(Rosso.getPath())
 }
 
-module.exports = Rosso
+
+/**
+ * Expose Rosso
+ */
+if(module) module.exports = Rosso
 window.Rosso = Rosso
 
-},{"./Context.js":"/Users/Alessandro/Desktop/Rosso.js/src/Context.js","./Route.js":"/Users/Alessandro/Desktop/Rosso.js/src/Route.js"}],"/Users/Alessandro/Desktop/Rosso.js/src/Route.js":[function(require,module,exports){
+},{"./Context.js":2,"./Route.js":4}],4:[function(require,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -421,16 +488,16 @@ window.Rosso = Rosso
 * Module dependencies.
 */
 
-var pathtoRegexp = require('path-to-regexp')
+var pathToRegexp = require('path-to-regexp')
 
 /**
- * Initialize `Route` with the given HTTP `path`,
- * and an array of `callbacks` and `options`.
+ * Initialize `Route` with the given HTTP `path`
+ * and `options`.
  *
- * Options:
+ * Options (see also https://github.com/pillarjs/path-to-regexp#usage ):
  *
- *		  - `sensitive`		enable case-sensitive routes
- *		  - `strict`				 enable strict matching for trailing slashes
+ *		  - `sensitive`		enable case-sensitive routes [false]
+ *		  - `strict`		enable strict matching for trailing slashes [false]
  *
  * @param {String} path
  * @param {Object} options.
@@ -439,7 +506,7 @@ var pathtoRegexp = require('path-to-regexp')
 function Route(path, options) {
 	options = options || {}
 	this.path = (path === '*') ? '(.*)' : path
-	this.regexp = pathtoRegexp(this.path,
+	this.regexp = pathToRegexp(this.path,
 		this.keys = [],
 		options.sensitive,
 		options.strict)
@@ -477,12 +544,12 @@ Route.prototype.match = function(path, params) {
 		? path.slice(0, qsIndex)
 		: path
 	var m = this.regexp.exec(decodeURIComponent(pathname))
-
+	
 	if(!m) return false
-
+	
 	for(var i = 1, len = m.length; i < len; ++i) {
 		var key = keys[i - 1]
-
+		
 		var val = (typeof m[i] == 'string')
 			? decodeURIComponent(m[i])
 			: m[i]
@@ -496,10 +563,14 @@ Route.prototype.match = function(path, params) {
 			params.push(val)
 		}
 	}
-
+	
 	return true
 }
 
+/**
+ * Expose Route
+ */
+
 module.exports = Route
 
-},{"path-to-regexp":"/Users/Alessandro/Desktop/Rosso.js/node_modules/path-to-regexp/index.js"}]},{},["/Users/Alessandro/Desktop/Rosso.js/src/Rosso.js"]);
+},{"path-to-regexp":1}]},{},[3]);

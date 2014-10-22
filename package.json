@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git://github.com/EgoAleSum/Rosso.js.git"
   },
-  "devDependencies": {
+  "dependencies": {
     "path-to-regexp": "1.x"
   }
 }

@@ -7,42 +7,45 @@
 
 'use strict';
 
+/**
+ * Require dependencies with browserify.
+ */
 var Route = require('./Route.js')
 var Context = require('./Context.js')
 
 /**
  * Running flag.
  */
-
 var running = false
 
+/**
+ * Default options for Rosso.js.
+ */
 var options = {
 	container: ''
 }
 
+/**
+ * Holds the `args` object for the current page.
+ */
 var currentPage = false
 
 /**
- * Register `path` with callback `fn()`,
- * or route `path`, or `Rosso.init()`.
+ * Register `path` with `args`,
+ * or show page `path`, or `Rosso.init([options])`.
  *
- *		  Rosso(fn)
- *		  Rosso('*', fn)
- *		  Rosso('/user/:id', load)
- *		  Rosso('/user/' + user.id, { some: 'thing' })
- *		  Rosso('/user/' + user.id)
+ *		  Rosso('*', args)
+ *		  Rosso('/user/:id', args)
+ *		  Rosso('/list/')
  *		  Rosso()
+ *		  Rosso(options)
  *
  * @param {String|Object} path
  * @param {Object} args...
+ * @api public
  */
 
 function Rosso(path, args) {
-	// <callback>
-	if('function' == typeof path) {
-		return Rosso('*', path)
-	}
-
 	// route <path> to <callback ...>
 	if(typeof args == 'object') {
 		var newRoute = new Route(path)
@@ -50,22 +53,14 @@ function Rosso(path, args) {
 			Rosso.loadPage(args, ctx, next)
 		}))
 	}
-	// show <path> with [state]
+	// show <path>
 	else if(typeof path == 'string') {
 		Rosso.show(path)
 	}
-	// init [options]
+	// init with [options]
 	else {
 		Rosso.init(path)
 	}
-}
-
-Rosso.setOption = function(name, value) {
-	options[name] = value
-}
-
-Rosso.getOption = function(name) {
-	return options[name]
 }
 
 /**
@@ -75,15 +70,38 @@ Rosso.getOption = function(name) {
 Rosso.callbacks = []
 
 /**
- * Bind with the given `options`.
+ * Set `value` for option `name`.
+ *
+ * @param {String} name
+ * @param {String} value
+ * @api public
+ */
+ 
+Rosso.setOption = function(name, value) {
+	options[name] = value
+}
+
+/**
+ * Return the value for option `name`.
+ *
+ * @param {String} name
+ * @return {String}
+ * @api public
+ */
+
+Rosso.getOption = function(name) {
+	return options[name]
+}
+
+/**
+ * Initialize Rosso.js listener with `opts`.
  *
  * Options:
  *
- *		  - `click` bind to click events [true]
- *		  - `popstate` bind to popstate [true]
- *		  - `dispatch` perform initial dispatch [true]
+ *		  - `container` id of the container object where to display views, or empty to disable ['']
  *
- * @param {Object} options
+ * @param {Object} opts
+ * @api public
  */
 
 Rosso.init = function(opts) {
@@ -94,7 +112,7 @@ Rosso.init = function(opts) {
 	if(!running) {
 		running = true
 		window.addEventListener('hashchange', locationHashChanged, false)
-		// Force the callback when page loads
+		// Force the callback when first init (normally at page load)
 		locationHashChanged()
 	}
 }
@@ -102,6 +120,7 @@ Rosso.init = function(opts) {
 /**
  * Unbind hashchange event handler.
  *
+ * @api public
  */
 
 Rosso.deinit = function() {
@@ -109,21 +128,33 @@ Rosso.deinit = function() {
 	window.removeEventListener('hashchange', locationHashChanged, false)
 }
 
-Rosso.getPath = function() {
-	if(window.location.href.indexOf('#') > -1)
-	{
-		var parts = window.location.href.split('#')
-		return parts[parts.length - 1]
-	}
-	return ''
+/**
+ * Push a new `path` into the history stack.
+ *
+ * @param {String} path
+ * @api public
+ */
+
+Rosso.push = function(path) {
+	window.location.hash = "#"+path
 }
 
 /**
- * Show `path` with optional `state` object.
+ * Pop the history stack.
+ *
+ * @api public
+ */
+
+Rosso.pop = function() {
+	window.history.back()
+}
+
+/**
+ * Show `path`.
  *
  * @param {String} path
- * @param {Object} state
  * @return {Context}
+ * @api private
  */
 
 Rosso.show = function(path) {
@@ -141,17 +172,35 @@ Rosso.show = function(path) {
 		if(!fn) return
 		fn(ctx, next)
 	}
-
 	next()
+	
+	return ctx
 }
 
-Rosso.push = function(path) {
-	window.location.hash = "#"+path
+/**
+ * Get current path.
+ *
+ * @return {String}
+ * @api private
+ */
+
+Rosso.getPath = function() {
+	if(window.location.href.indexOf('#') > -1)
+	{
+		var parts = window.location.href.split('#')
+		return parts[parts.length - 1]
+	}
+	return ''
 }
 
-Rosso.pop = function() {
-	window.history.back()
-}
+/**
+ * Load a page: initialize it and show the view.
+ *
+ * @param {Object} args
+ * @param {Context} ctx
+ * @param {Function} next
+ * @api private
+ */
 
 Rosso.loadPage = function(args, ctx, next) {
 	if(args.view && options.container) {
@@ -181,15 +230,30 @@ Rosso.loadPage = function(args, ctx, next) {
 	}
 }
 
+/**
+ * Unload a page.
+ *
+ * @param {Object} args
+ * @api private
+ */
+
 Rosso.unloadPage = function(args) {
 	if(args.deinit) {
 		args.destroy()
 	}
 }
 
+/**
+ * Handle hashchange events.
+ */
+
 function locationHashChanged() {
 	Rosso.show(Rosso.getPath())
 }
 
-module.exports = Rosso
+
+/**
+ * Expose Rosso
+ */
+if(module) module.exports = Rosso
 window.Rosso = Rosso
