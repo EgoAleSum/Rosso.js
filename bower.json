@@ -1,0 +1,26 @@
+{
+  "name": "Rosso.js",
+  "main": "Rosso.js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/EgoAleSum/Rosso.js",
+  "description": "Minimal client-side JS framework",
+  "keywords": [
+    "js",
+    "framework",
+    "client-side",
+    "minimal"
+  ],
+  "authors": [
+    "Alessandro Segala (http://github.com/egoalesum)"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test.html",
+    "testviews",
+    "package.json",
+    "Gruntfile.js"
+  ]
+}
