@@ -26,9 +26,9 @@ var options = {
 }
 
 /**
- * Holds the `args` object for the current page.
+ * Hold the `args` object for the current pages.
  */
-var currentPage = false
+var currentPages = []
 
 /**
  * Register `path` with `args`,
@@ -50,6 +50,7 @@ function Rosso(path, args) {
 	if(typeof args == 'object') {
 		var newRoute = new Route(path)
 		Rosso.callbacks.push(newRoute.middleware(function(ctx, next) {
+			currentPages.push(args)
 			Rosso.loadPage(args, ctx, next)
 		}))
 	}
@@ -158,9 +159,9 @@ Rosso.pop = function() {
  */
 
 Rosso.show = function(path) {
-	if(currentPage) {
-		Rosso.unloadPage(currentPage)
-		currentPage = false
+	if(currentPages.length) {
+		Rosso.unloadPages(currentPages)
+		currentPages = []
 	}
 	
 	var i = 0
@@ -231,15 +232,17 @@ Rosso.loadPage = function(args, ctx, next) {
 }
 
 /**
- * Unload a page.
+ * Unload a list of pages.
  *
- * @param {Object} args
+ * @param {Array} pages (array of args)
  * @api private
  */
 
-Rosso.unloadPage = function(args) {
-	if(args.destroy) {
-		args.destroy()
+Rosso.unloadPages = function(pages) {
+	for(var i in pages) {
+		if(pages[i].destroy) {
+			pages[i].destroy()
+		}
 	}
 }
 

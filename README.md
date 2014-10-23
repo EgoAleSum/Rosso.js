@@ -130,7 +130,7 @@ You can create your own paths with regular expressions as well. See the [manual]
         - `ctx.path`: the full path matched (e.g. `/list/el20?foo=bar`)
         - `ctx.pathname`: the path without the querystring (e.g. `/list/el20`)
         - `ctx.querystring`: the full querystring (e.g. `foo=bar`)
-        - `ctx.params`: an array with matched params from the path (e.g. with route `/list/:id`, ['el20'])
+        - `ctx.params`: an array with matched params from the path (e.g. with route `/list/:id`, `['el20']`)
         - `ctx.querystringParams`: an object with the key-value pairs from the query string (e.g. `{foo: 'bar'}`)
     * `next`: a function to be called to perform the following callback for the route, if any (like in Express)
 - `destroy` is a *function* called before the view is unloaded and replaced with a new one. Use this function to unregister observers and perform any other action.
