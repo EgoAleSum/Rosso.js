@@ -12,7 +12,7 @@
     "url": "git://github.com/EgoAleSum/Rosso.js.git"
   },
   "dependencies": {
-    "path-to-regexp": "1.x"
+    "path-to-regexp": "pillarjs/path-to-regexp"
   },
   "devDependencies": {
     "grunt": "*",
