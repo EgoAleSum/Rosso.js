@@ -1,7 +1,7 @@
 {
   "name": "Rosso.js",
   "main": "Rosso.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/EgoAleSum/Rosso.js",
   "description": "Minimal client-side JS framework",
   "keywords": [
