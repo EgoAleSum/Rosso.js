@@ -137,7 +137,7 @@ Rosso.deinit = function() {
  */
 
 Rosso.push = function(path) {
-	window.location.hash = "#"+path
+	window.location.hash = '#'+path
 }
 
 /**
@@ -148,6 +148,25 @@ Rosso.push = function(path) {
 
 Rosso.pop = function() {
 	window.history.back()
+}
+
+/**
+ * Replaces the current page with `path` without modifying the history stack.
+ *
+ * @param {String} path
+ * @api public
+ */
+
+Rosso.replace = function(path) {
+	// For browsers supporting HTML5 History API, this code is preferred. The other code does not work on Chrome on iOS and other browsers
+	if(window.history && history.replaceState) {
+		history.replaceState(undefined, undefined, '#'+path)
+		// Force an update (necessary when not using location.replace)
+		locationHashChanged()
+	}
+	else {
+		location.replace('#'+path)
+	}
 }
 
 /**

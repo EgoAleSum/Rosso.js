@@ -171,6 +171,7 @@ You can also push/pop a new page programmatically:
 ```javascript
 Rosso.push('/page/next') // Shows a new page
 Rosso.pop() // Goes back
+Rosso.replace('/page/other') // Replaces the current page without creating a new entry in the browser's history
 ```
 
 Each change of the hash creates a new element in the browser's history stack. Clicking the "previous" and "next" buttons in the browser will interact with Rosso.js to change page.
