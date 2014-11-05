@@ -26,9 +26,9 @@ var options = {
 }
 
 /**
- * Hold the `args` object for the current pages.
+ * Hold the `args` object for the current page.
  */
-var currentPages = []
+var currentPage = false
 
 /**
  * Register `path` with `args`,
@@ -48,11 +48,8 @@ var currentPages = []
 function Rosso(path, args) {
 	// route <path> to <callback ...>
 	if(typeof args == 'object') {
-		var newRoute = new Route(path)
-		Rosso.callbacks.push(newRoute.middleware(function(ctx, next) {
-			currentPages.push(args)
-			Rosso.loadPage(args, ctx, next)
-		}))
+		var newRoute = new Route(path, args)
+		Rosso.callbacks.push(newRoute)
 	}
 	// show <path>
 	else if(typeof path == 'string') {
@@ -137,6 +134,9 @@ Rosso.deinit = function() {
  */
 
 Rosso.push = function(path) {
+	// Remove starting # if present
+	if(path.substr(0, 1) == '#') path = path.substr(1)
+	
 	window.location.hash = '#'+path
 }
 
@@ -158,6 +158,9 @@ Rosso.pop = function() {
  */
 
 Rosso.replace = function(path) {
+	// Remove starting # if present
+	if(path.substr(0, 1) == '#') path = path.substr(1)
+	
 	// For browsers supporting HTML5 History API, this code is preferred. The other code does not work on Chrome on iOS and other browsers
 	if(window.history && history.replaceState) {
 		history.replaceState(undefined, undefined, '#'+path)
@@ -178,21 +181,24 @@ Rosso.replace = function(path) {
  */
 
 Rosso.show = function(path) {
-	if(currentPages.length) {
-		Rosso.unloadPages(currentPages)
-		currentPages = []
+	// Remove starting # if present
+	if(path.substr(0, 1) == '#') path = path.substr(1)
+	
+	if(currentPage) {
+		Rosso.unloadPage(currentPage)
+		currentPage = false
 	}
 	
-	var i = 0
 	if(!path) path = ''
 	
 	var ctx = new Context(path)
-	function next() {
-		var fn = Rosso.callbacks[i++]
-		if(!fn) return
-		fn(ctx, next)
+	for(var i = 0; i < Rosso.callbacks.length; i++) {
+		var route = Rosso.callbacks[i]
+		if(route.match(ctx.path, ctx.params)) {
+			Rosso.loadPage(route.args, ctx)
+			currentPage = route.args
+		}
 	}
-	next()
 	
 	return ctx
 }
@@ -222,7 +228,7 @@ Rosso.getPath = function() {
  * @api private
  */
 
-Rosso.loadPage = function(args, ctx, next) {
+Rosso.loadPage = function(args, ctx) {
 	if(args.view && options.container) {
 		var destinationEl = document.getElementById(options.container)
 		
@@ -243,25 +249,20 @@ Rosso.loadPage = function(args, ctx, next) {
 	}
 	
 	if(args.init) {
-		args.init(ctx, next)
-	}
-	else {
-		if(next) next()
+		args.init(ctx)
 	}
 }
 
 /**
- * Unload a list of pages.
+ * Unload a page.
  *
- * @param {Array} pages (array of args)
+ * @param {Object} page
  * @api private
  */
 
-Rosso.unloadPages = function(pages) {
-	for(var i in pages) {
-		if(pages[i].destroy) {
-			pages[i].destroy()
-		}
+Rosso.unloadPage = function(page) {
+	if(page.destroy) {
+		page.destroy()
 	}
 }
 

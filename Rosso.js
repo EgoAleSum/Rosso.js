@@ -1,4 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var isArray = require('isarray');
+
 /**
  * Expose `pathtoRegexp`.
  */
@@ -59,7 +61,7 @@ function attachKeys (re, keys) {
  * @return {RegExp}
  */
 function pathtoRegexp (path, keys, options) {
-  if (!Array.isArray(keys)) {
+  if (!isArray(keys)) {
     options = keys;
     keys = null;
   }
@@ -95,7 +97,7 @@ function pathtoRegexp (path, keys, options) {
   // Map array parts into regexps and return their source. We also pass
   // the same keys and options instance into every generation to get
   // consistent matching groups before we join the sources together.
-  if (Array.isArray(path)) {
+  if (isArray(path)) {
     var parts = [];
 
     for (var i = 0; i < path.length; i++) {
@@ -170,7 +172,12 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{}],2:[function(require,module,exports){
+},{"isarray":2}],2:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+},{}],3:[function(require,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -216,7 +223,7 @@ function Context(path) {
 
 if(module) module.exports = Context
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -245,9 +252,9 @@ var options = {
 }
 
 /**
- * Hold the `args` object for the current pages.
+ * Hold the `args` object for the current page.
  */
-var currentPages = []
+var currentPage = false
 
 /**
  * Register `path` with `args`,
@@ -267,11 +274,8 @@ var currentPages = []
 function Rosso(path, args) {
 	// route <path> to <callback ...>
 	if(typeof args == 'object') {
-		var newRoute = new Route(path)
-		Rosso.callbacks.push(newRoute.middleware(function(ctx, next) {
-			currentPages.push(args)
-			Rosso.loadPage(args, ctx, next)
-		}))
+		var newRoute = new Route(path, args)
+		Rosso.callbacks.push(newRoute)
 	}
 	// show <path>
 	else if(typeof path == 'string') {
@@ -356,6 +360,9 @@ Rosso.deinit = function() {
  */
 
 Rosso.push = function(path) {
+	// Remove starting # if present
+	if(path.substr(0, 1) == '#') path = path.substr(1)
+	
 	window.location.hash = '#'+path
 }
 
@@ -377,6 +384,9 @@ Rosso.pop = function() {
  */
 
 Rosso.replace = function(path) {
+	// Remove starting # if present
+	if(path.substr(0, 1) == '#') path = path.substr(1)
+	
 	// For browsers supporting HTML5 History API, this code is preferred. The other code does not work on Chrome on iOS and other browsers
 	if(window.history && history.replaceState) {
 		history.replaceState(undefined, undefined, '#'+path)
@@ -397,21 +407,24 @@ Rosso.replace = function(path) {
  */
 
 Rosso.show = function(path) {
-	if(currentPages.length) {
-		Rosso.unloadPages(currentPages)
-		currentPages = []
+	// Remove starting # if present
+	if(path.substr(0, 1) == '#') path = path.substr(1)
+	
+	if(currentPage) {
+		Rosso.unloadPage(currentPage)
+		currentPage = false
 	}
 	
-	var i = 0
 	if(!path) path = ''
 	
 	var ctx = new Context(path)
-	function next() {
-		var fn = Rosso.callbacks[i++]
-		if(!fn) return
-		fn(ctx, next)
+	for(var i = 0; i < Rosso.callbacks.length; i++) {
+		var route = Rosso.callbacks[i]
+		if(route.match(ctx.path, ctx.params)) {
+			Rosso.loadPage(route.args, ctx)
+			currentPage = route.args
+		}
 	}
-	next()
 	
 	return ctx
 }
@@ -441,7 +454,7 @@ Rosso.getPath = function() {
  * @api private
  */
 
-Rosso.loadPage = function(args, ctx, next) {
+Rosso.loadPage = function(args, ctx) {
 	if(args.view && options.container) {
 		var destinationEl = document.getElementById(options.container)
 		
@@ -462,25 +475,20 @@ Rosso.loadPage = function(args, ctx, next) {
 	}
 	
 	if(args.init) {
-		args.init(ctx, next)
-	}
-	else {
-		if(next) next()
+		args.init(ctx)
 	}
 }
 
 /**
- * Unload a list of pages.
+ * Unload a page.
  *
- * @param {Array} pages (array of args)
+ * @param {Object} page
  * @api private
  */
 
-Rosso.unloadPages = function(pages) {
-	for(var i in pages) {
-		if(pages[i].destroy) {
-			pages[i].destroy()
-		}
+Rosso.unloadPage = function(page) {
+	if(page.destroy) {
+		page.destroy()
 	}
 }
 
@@ -499,7 +507,7 @@ function locationHashChanged() {
 if(module) module.exports = Rosso
 window.Rosso = Rosso
 
-},{"./Context.js":2,"./Route.js":4}],4:[function(require,module,exports){
+},{"./Context.js":3,"./Route.js":5}],5:[function(require,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -525,32 +533,38 @@ var pathToRegexp = require('path-to-regexp')
  *		  - `strict`		enable strict matching for trailing slashes [false]
  *
  * @param {String} path
- * @param {Object} options.
+ * @param {Object} args
+ * @param {Object} options
  */
 
-function Route(path, options) {
+function Route(path, args, options) {
 	options = options || {}
 	this.path = (path === '*') ? '(.*)' : path
 	this.regexp = pathToRegexp(this.path,
 		this.keys = [],
 		options.sensitive,
 		options.strict)
+	this.args = args
 }
 
 /**
- * Return route middleware with
- * the given callback `fn()`.
+ * Return args for the current route.
  *
- * @param {Function} fn
- * @return {Function}
+ * @return {Object}
  */
 
-Route.prototype.middleware = function(fn){
-	var self = this
-	return function(ctx, next) {
-		if(self.match(ctx.path, ctx.params)) return fn(ctx, next)
-		next()
-	}
+Route.prototype.getArgs = function() {
+	return this.args ? this.args : {}
+}
+
+/**
+ * Set args for the current route.
+ *
+ * @param {Object} args
+ */
+ 
+ Route.prototype.setArgs = function(args) {
+	this.args = args
 }
 
 /**
@@ -598,4 +612,4 @@ Route.prototype.match = function(path, params) {
 
 module.exports = Route
 
-},{"path-to-regexp":1}]},{},[3]);
+},{"path-to-regexp":1}]},{},[4]);

@@ -23,32 +23,38 @@ var pathToRegexp = require('path-to-regexp')
  *		  - `strict`		enable strict matching for trailing slashes [false]
  *
  * @param {String} path
- * @param {Object} options.
+ * @param {Object} args
+ * @param {Object} options
  */
 
-function Route(path, options) {
+function Route(path, args, options) {
 	options = options || {}
 	this.path = (path === '*') ? '(.*)' : path
 	this.regexp = pathToRegexp(this.path,
 		this.keys = [],
 		options.sensitive,
 		options.strict)
+	this.args = args
 }
 
 /**
- * Return route middleware with
- * the given callback `fn()`.
+ * Return args for the current route.
  *
- * @param {Function} fn
- * @return {Function}
+ * @return {Object}
  */
 
-Route.prototype.middleware = function(fn){
-	var self = this
-	return function(ctx, next) {
-		if(self.match(ctx.path, ctx.params)) return fn(ctx, next)
-		next()
-	}
+Route.prototype.getArgs = function() {
+	return this.args ? this.args : {}
+}
+
+/**
+ * Set args for the current route.
+ *
+ * @param {Object} args
+ */
+ 
+ Route.prototype.setArgs = function(args) {
+	this.args = args
 }
 
 /**
