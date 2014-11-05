@@ -9,7 +9,6 @@
 			// Manipulate DOM, setup actions, register callbacks, etc
 			console.log('Init /test', ctx)
 			document.title = 'Some test route'
-			next()
 		},
 		destroy: function() {
 			// Unregister all callbacks, etc

@@ -272,10 +272,10 @@ var currentPage = false
  */
 
 function Rosso(path, args) {
-	// route <path> to <callback ...>
+	// route <path> to <args>
 	if(typeof args == 'object') {
 		var newRoute = new Route(path, args)
-		Rosso.callbacks.push(newRoute)
+		Rosso.routes.push(newRoute)
 	}
 	// show <path>
 	else if(typeof path == 'string') {
@@ -288,10 +288,10 @@ function Rosso(path, args) {
 }
 
 /**
- * Callback functions.
+ * Contain all routes.
  */
 
-Rosso.callbacks = []
+Rosso.routes = []
 
 /**
  * Set `value` for option `name`.
@@ -418,8 +418,8 @@ Rosso.show = function(path) {
 	if(!path) path = ''
 	
 	var ctx = new Context(path)
-	for(var i = 0; i < Rosso.callbacks.length; i++) {
-		var route = Rosso.callbacks[i]
+	for(var i = 0; i < Rosso.routes.length; i++) {
+		var route = Rosso.routes[i]
 		if(route.match(ctx.path, ctx.params)) {
 			Rosso.loadPage(route.args, ctx)
 			currentPage = route.args

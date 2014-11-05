@@ -7,7 +7,6 @@
 			// Manipulate DOM, setup actions, register callbacks, etc
 			console.log('Init /home', ctx)
 			document.title = 'Home'
-			next()
 		},
 		destroy: function() {
 			// Unregister all callbacks, etc
@@ -27,7 +26,6 @@
 			// Manipulate DOM, setup actions, register callbacks, etc
 			console.log('Should never appear!', ctx)
 			document.title = 'Home error'
-			next()
 		},
 		destroy: function() {
 			// Unregister all callbacks, etc
