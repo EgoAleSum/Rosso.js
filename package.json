@@ -1,7 +1,7 @@
 {
   "name": "rosso",
   "description": "Minimal client-side JS framework",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "license": "MIT",
   "author": "Alessandro Segala (http://github.com/egoalesum)",
   "contributors": [
