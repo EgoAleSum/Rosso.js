@@ -26,7 +26,7 @@ var options = {
 }
 
 /**
- * Hold the `args` object for the current page.
+ * Hold the Route object for the current page.
  */
 var currentPage = false
 
@@ -34,11 +34,11 @@ var currentPage = false
  * Register `path` with `args`,
  * or show page `path`, or `Rosso.init([options])`.
  *
- *		  Rosso('*', args)
  *		  Rosso('/user/:id', args)
  *		  Rosso('/list/')
  *		  Rosso()
  *		  Rosso(options)
+ *		  Rosso('*', args)
  *
  * @param {String|Object} path
  * @param {Object} args...
@@ -62,10 +62,23 @@ function Rosso(path, args) {
 }
 
 /**
- * Contain all routes.
+ * Contain all routes and middlewares.
  */
 
 Rosso.routes = []
+Rosso.middlewares = {}
+
+/**
+ * Register a middleware.
+ *
+ * @param {String} name
+ * @param {Object} args
+ * @api public
+ */
+
+Rosso.middleware = function(name, args) {
+	Rosso.middlewares[name] = args
+}
 
 /**
  * Set `value` for option `name`.
@@ -195,8 +208,10 @@ Rosso.show = function(path) {
 	for(var i = 0; i < Rosso.routes.length; i++) {
 		var route = Rosso.routes[i]
 		if(route.match(ctx.path, ctx.params)) {
-			Rosso.loadPage(route.args, ctx)
-			currentPage = route.args
+			Rosso.loadPage(route.args, ctx, function(success) {
+				currentPage = route
+			})
+			break
 		}
 	}
 	
@@ -211,8 +226,7 @@ Rosso.show = function(path) {
  */
 
 Rosso.getPath = function() {
-	if(window.location.href.indexOf('#') > -1)
-	{
+	if(window.location.href.indexOf('#') > -1) {
 		var parts = window.location.href.split('#')
 		return parts[parts.length - 1]
 	}
@@ -224,45 +238,80 @@ Rosso.getPath = function() {
  *
  * @param {Object} args
  * @param {Context} ctx
- * @param {Function} next
+ * @param {Function} endCallback(success)
  * @api private
  */
 
-Rosso.loadPage = function(args, ctx) {
-	if(args.view && options.container) {
-		var destinationEl = document.getElementById(options.container)
+Rosso.loadPage = function(args, ctx, endCallback) {
+	// Using slice to copy the array without referencing it
+	var callbacks = args.middlewares ? args.middlewares.slice() : []
+	
+	var initPage = function(ctx, next) {
+		if(args.view && options.container) {
+			var destinationEl = document.getElementById(options.container)
+			
+			// View is a string with the id of an element
+			if(typeof args.view == 'string' && args.view[0] == '#') {
+				var sourceEl = document.getElementById(args.view.substr(1))
+				if(sourceEl && destinationEl) {
+					var contents = sourceEl.innerHTML
+					destinationEl.innerHTML = contents
+				}
+			}
+			else if(typeof args.view == 'function') {
+				var contents = args.view(ctx)
+				if(destinationEl) {
+					destinationEl.innerHTML = contents
+				}
+			}
+		}
 		
-		// View is a string with the id of an element
-		if(typeof args.view == 'string' && args.view[0] == '#') {
-			var sourceEl = document.getElementById(args.view.substr(1))
-			if(sourceEl && destinationEl) {
-				var contents = sourceEl.innerHTML
-				destinationEl.innerHTML = contents
-			}
+		if(args.init) {
+			args.init(ctx, next)
 		}
-		else if(typeof args.view == 'function') {
-			var contents = args.view(ctx)
-			if(destinationEl) {
-				destinationEl.innerHTML = contents
-			}
-		}
+	}
+	callbacks.push(initPage)
+		
+	var errorCb = function(ctx, next) {
+		next(true)
 	}
 	
-	if(args.init) {
-		args.init(ctx)
+	// next(error): the callback to continue with the following middleware. Pass any value that casts to true to interrput the cycle
+	var next = function(error) {
+		if(error) {
+			return endCallback(false)
+		}
+		
+		var cb = callbacks.shift()
+		if(cb) {
+			// Load middleware with name 'cb'
+			if(typeof cb == 'string') {
+				cb = Rosso.middlewares[cb] ? Rosso.middlewares[cb].init : false
+				if(!cb) {
+					cb = errorCb
+				}
+			}
+			cb(ctx, next)
+		}
+		else {
+			endCallback(true)
+		}
 	}
+	next()
+	
+	return true
 }
 
 /**
  * Unload a page.
  *
- * @param {Object} page
+ * @param {Route} page
  * @api private
  */
 
 Rosso.unloadPage = function(page) {
-	if(page.destroy) {
-		page.destroy()
+	if(page.args.destroy) {
+		page.args.destroy()
 	}
 }
 
