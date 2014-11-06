@@ -105,15 +105,15 @@ Rosso('/list', args)
 Rosso('/list/:id', args)
 ```
 
-Note that you can bind multiple args to the same route by calling it more than once.<br>
-There is also a special "catch-all" route `*`.<br>
+Only one route is matched for each path, so - for those familiar with Express - you cannot register multiple objects with the same path.<br>
+There is also a special "catch-all" route `*`. This one is particularly useful to create "404" pages, when called at the end.<br>
 Examples:
 
 ```javascript
-Rosso('*', args1)
-Rosso('/list', args2)
-Rosso('/list', args3)
-// /list will show args1, args2 AND args3
+Rosso('/home', argsHome)
+Rosso('/list', argsList)
+// 404 page; this has to be called at the end
+Rosso('*', argsNotFound)
 ```
 
 You can create your own paths with regular expressions as well. See the [manual](https://github.com/pillarjs/path-to-regexp#usage) for Path-to-RegExp for more details.
@@ -145,16 +145,15 @@ Rosso('/', {
     init: function(ctx, next) {
         console.log('/home Context:', ctx)
         document.title = 'Home' // Set a title for the browser
-            next() // Perform the next callback for the route (if any)
+        next() // Perform the next callback for the route (if any)
     },
     destroy: function() {
         // Unregister all callbacks, etc
-    },
-    privateMethod: function() {
-        // Do something
     }
 })
 ```
+
+A complete example can be found in the `test` directory.
 
 ## Navigating
 
