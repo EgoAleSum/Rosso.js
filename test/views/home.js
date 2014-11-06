@@ -13,9 +13,6 @@
 		destroy: function() {
 			// Unregister all callbacks, etc
 			console.log('Destroy /home')
-		},
-		testmethod: function(sender) {
-			console.log('testmethod caled by: '+sender.id)
 		}
 	})
 	
