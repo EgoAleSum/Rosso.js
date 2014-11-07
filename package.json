@@ -1,7 +1,7 @@
 {
   "name": "rosso",
   "description": "Minimal client-side JS framework",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "MIT",
   "author": "Alessandro Segala (http://github.com/egoalesum)",
   "contributors": [
@@ -15,11 +15,12 @@
     "path-to-regexp": "pillarjs/path-to-regexp"
   },
   "devDependencies": {
+    "derequire": "*",
     "grunt": "*",
-    "grunt-contrib-uglify": "*",
-    "grunt-contrib-concat": "*",
-    "grunt-contrib-watch": "*",
     "grunt-browserify": "*",
-    "grunt-contrib-clean": "*"
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-watch": "*"
   }
 }

@@ -1,9 +1,28 @@
+var derequire = require('derequire')
+
 module.exports = function(grunt) {
 	grunt.initConfig({
 		browserify: {
 			dist: {
-				files: {
-					'Rosso.js': ['src/Rosso.js']
+				src: ['src/Rosso.js'],
+				dest: 'Rosso.js'
+			},
+			options: {
+				browserifyOptions: {
+					standalone: 'Rosso'
+				},
+				postBundleCB: function(err, src, next) {
+					// Run derequire
+					var modifiedSrc = false
+					
+					if(!err) {
+						modifiedSrc = derequire(src)
+						if(!modifiedSrc) {
+							err = true
+						}
+					}
+					
+					next(err, modifiedSrc)
 				}
 			}
 		},

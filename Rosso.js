@@ -1,5 +1,5 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var isArray = require('isarray');
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var o;"undefined"!=typeof window?o=window:"undefined"!=typeof global?o=global:"undefined"!=typeof self&&(o=self),o.Rosso=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+var isArray = _dereq_('isarray');
 
 /**
  * Expose `pathtoRegexp`.
@@ -172,12 +172,12 @@ function pathtoRegexp (path, keys, options) {
   return attachKeys(new RegExp('^' + path + (end ? '$' : ''), flags), keys);
 };
 
-},{"isarray":2}],2:[function(require,module,exports){
+},{"isarray":2}],2:[function(_dereq_,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],3:[function(require,module,exports){
+},{}],3:[function(_dereq_,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -223,7 +223,7 @@ function Context(path) {
 
 if(module) module.exports = Context
 
-},{}],4:[function(require,module,exports){
+},{}],4:[function(_dereq_,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -236,8 +236,8 @@ if(module) module.exports = Context
 /**
  * Require dependencies with browserify.
  */
-var Route = require('./Route.js')
-var Context = require('./Context.js')
+var Route = _dereq_('./Route.js')
+var Context = _dereq_('./Context.js')
 
 /**
  * Running flag.
@@ -556,7 +556,7 @@ function locationHashChanged() {
 if(module) module.exports = Rosso
 window.Rosso = Rosso
 
-},{"./Context.js":3,"./Route.js":5}],5:[function(require,module,exports){
+},{"./Context.js":3,"./Route.js":5}],5:[function(_dereq_,module,exports){
 /*!
  Rosso.js - minimal client-side JS framework
  (C) 2014 Alessandro Segala
@@ -570,7 +570,7 @@ window.Rosso = Rosso
 * Module dependencies.
 */
 
-var pathToRegexp = require('path-to-regexp')
+var pathToRegexp = _dereq_('path-to-regexp')
 
 /**
  * Initialize `Route` with the given HTTP `path`
@@ -661,4 +661,5 @@ Route.prototype.match = function(path, params) {
 
 module.exports = Route
 
-},{"path-to-regexp":1}]},{},[4]);
+},{"path-to-regexp":1}]},{},[4])(4)
+});
