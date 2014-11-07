@@ -153,7 +153,7 @@ Rosso('/', {
 })
 ```
 
-A complete example can be found in the `test` directory.
+Complete examples can be found in the `examples` directory.
 
 ## Navigating
 
