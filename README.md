@@ -175,6 +175,16 @@ Rosso.replace('/page/other') // Replaces the current page without creating a new
 
 Each change of the hash creates a new element in the browser's history stack. Clicking the "previous" and "next" buttons in the browser will interact with Rosso.js to change page.
 
+## Other public methods
+
+Other public methods exposed by Rosso.js:
+
+**Rosso.getPath()**
+Returns the current path (obtained from the location hash)
+
+**Rosso.currentPage()**
+Returns the args object for the current page. 
+
 ## Contributions and license
 
 Code is released under MIT License.<br>

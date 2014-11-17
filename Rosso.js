@@ -373,6 +373,8 @@ Rosso.deinit = function() {
  */
 
 Rosso.push = function(path) {
+	if(!running) return
+	
 	// Remove starting # if present
 	if(path.substr(0, 1) == '#') path = path.substr(1)
 	
@@ -386,6 +388,8 @@ Rosso.push = function(path) {
  */
 
 Rosso.pop = function() {
+	if(!running) return
+	
 	window.history.back()
 }
 
@@ -397,6 +401,8 @@ Rosso.pop = function() {
  */
 
 Rosso.replace = function(path) {
+	if(!running) return
+	
 	// Remove starting # if present
 	if(path.substr(0, 1) == '#') path = path.substr(1)
 	
@@ -410,6 +416,36 @@ Rosso.replace = function(path) {
 		location.replace('#'+path)
 	}
 }
+
+/**
+ * Get current path.
+ *
+ * @return {String}
+ * @api public
+ */
+
+Rosso.getPath = function() {
+	if(window.location.href.indexOf('#') > -1) {
+		var parts = window.location.href.split('#')
+		return parts[parts.length - 1]
+	}
+	return ''
+}
+
+/**
+ * Return current page args.
+ *
+ * @return {Object}
+ * @api public
+ */
+
+Rosso.currentPage = function() {
+	return currentPage.args
+}
+
+/*
+ * Private methods
+ */
 
 /**
  * Show `path`.
@@ -445,21 +481,6 @@ Rosso.show = function(path) {
 }
 
 /**
- * Get current path.
- *
- * @return {String}
- * @api private
- */
-
-Rosso.getPath = function() {
-	if(window.location.href.indexOf('#') > -1) {
-		var parts = window.location.href.split('#')
-		return parts[parts.length - 1]
-	}
-	return ''
-}
-
-/**
  * Load a page: initialize it and show the view.
  *
  * @param {Object} args
@@ -473,6 +494,10 @@ Rosso.loadPage = function(args, ctx, endCallback) {
 	var callbacks = args.middlewares ? args.middlewares.slice() : []
 	
 	var initPage = function(ctx, next) {
+		// Store the ctx object in the args
+		args.ctx = ctx
+		
+		// Load the corresponding view
 		if(args.view && options.container) {
 			var destinationEl = document.getElementById(options.container)
 			
@@ -492,6 +517,7 @@ Rosso.loadPage = function(args, ctx, endCallback) {
 			}
 		}
 		
+		// Init the page
 		if(args.init) {
 			args.init(ctx, next)
 		}
@@ -536,6 +562,10 @@ Rosso.loadPage = function(args, ctx, endCallback) {
  */
 
 Rosso.unloadPage = function(page) {
+	if(page.args.ctx) {
+		delete page.args.ctx
+	}
+	
 	if(page.args.destroy) {
 		page.args.destroy()
 	}
