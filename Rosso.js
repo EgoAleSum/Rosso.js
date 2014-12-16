@@ -310,7 +310,7 @@ Rosso.middleware = function(name, args) {
  * Set `value` for option `name`.
  *
  * @param {String} name
- * @param {String} value
+ * @param {Mixed} value
  * @api public
  */
  
@@ -322,7 +322,7 @@ Rosso.setOption = function(name, value) {
  * Return the value for option `name`.
  *
  * @param {String} name
- * @return {String}
+ * @return {Mixed}
  * @api public
  */
 
@@ -499,7 +499,14 @@ Rosso.loadPage = function(args, ctx, endCallback) {
 		
 		// Load the corresponding view
 		if(args.view && options.container) {
-			var destinationEl = document.getElementById(options.container)
+			var destinationEl = false
+			// Check if options.container is a DOM node or a string (the ID of a DOM node)
+			if(typeof options.container === 'object' && options.container.nodeName) {
+				destinationEl = options.container
+			}
+			else if(typeof options.container === 'string') {
+				destinationEl = document.getElementById(options.container)
+			}
 			
 			// View is a string with the id of an element
 			if(typeof args.view == 'string' && args.view[0] == '#') {

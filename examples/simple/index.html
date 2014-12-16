@@ -28,7 +28,9 @@
 <!-- Include the 404 page at the end as it's a catch-all -->
 <script type="text/javascript" src="views/404.js"></script>
 <script type="text/javascript">
-Rosso({container: 'main'})
+var selector = document.querySelector('#main') // DOM node
+// var selector = 'main' // ID of element
+Rosso({container: selector})
 </script>
 
 </body>
