@@ -46,7 +46,7 @@ Setting up Rosso.js is extremely easy:
 
 1. Load `Rosso.js` in your HTML page.
 2. Create a container for the views.
-3. Initialize the framework by calling `Rosso({container: 'htmlElementId')`.
+3. Initialize the framework by calling `Rosso({container: 'htmlElementId')`. Alternatively, you can pass any DOM node as container, for example: `Rosso({container: document.querySelect('#htmlElementId')})`.
 
 A sample page is presented here:
 
