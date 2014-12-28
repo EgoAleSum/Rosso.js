@@ -3,6 +3,7 @@
   "description": "Minimal client-side JS framework",
   "version": "0.2.3",
   "license": "MIT",
+  "main": "./Rosso.js",
   "author": "Alessandro Segala (http://github.com/egoalesum)",
   "contributors": [
     "TJ Holowaychuk (https://github.com/tj)"
