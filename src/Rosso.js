@@ -152,7 +152,10 @@ Rosso.push = function(path) {
 	// Remove starting # if present
 	if(path.substr(0, 1) == '#') path = path.substr(1)
 	
-	window.location.hash = '#'+path
+	// Execute this code when the current call stack is complete. This is necessary because a route may call a push/pop/replace inside the init method
+	setTimeout(function() {
+		window.location.hash = '#'+path
+	}, 0)
 }
 
 /**
@@ -164,7 +167,10 @@ Rosso.push = function(path) {
 Rosso.pop = function() {
 	if(!running) return
 	
-	window.history.back()
+	// Execute this code when the current call stack is complete. This is necessary because a route may call a push/pop/replace inside the init method
+	setTimeout(function() {
+		window.history.back()
+	}, 0)
 }
 
 /**
@@ -180,15 +186,18 @@ Rosso.replace = function(path) {
 	// Remove starting # if present
 	if(path.substr(0, 1) == '#') path = path.substr(1)
 	
-	// For browsers supporting HTML5 History API, this code is preferred. The other code does not work on Chrome on iOS and other browsers
-	if(window.history && history.replaceState) {
-		history.replaceState(undefined, undefined, '#'+path)
-		// Force an update (necessary when not using location.replace)
-		locationHashChanged()
-	}
-	else {
-		location.replace('#'+path)
-	}
+	// Execute this code when the current call stack is complete. This is necessary because a route may call a push/pop/replace inside the init method
+	setTimeout(function() {
+		// For browsers supporting HTML5 History API, this code is preferred. The other code does not work on Chrome on iOS and other browsers
+		if(window.history && history.replaceState) {
+			history.replaceState(undefined, undefined, '#'+path)
+			// Force an update (necessary when not using location.replace)
+			locationHashChanged()
+		}
+		else {
+			location.replace('#'+path)
+		}
+	}, 0)
 }
 
 /**
@@ -301,6 +310,9 @@ Rosso.loadPage = function(args, ctx, endCallback) {
 		// Init the page
 		if(args.init) {
 			args.init(ctx, next)
+		}
+		else {
+			next()
 		}
 	}
 	callbacks.push(initPage)
