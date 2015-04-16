@@ -1,0 +1,18 @@
+{
+  "name": "rosso",
+  "version": "0.2.5",
+  "dependencies": {
+    "path-to-regexp": {
+      "version": "1.0.3",
+      "from": "path-to-regexp@>=1.0.0 <1.1.0",
+      "resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.0.3.tgz",
+      "dependencies": {
+        "isarray": {
+          "version": "0.0.1",
+          "from": "isarray@0.0.1",
+          "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
+        }
+      }
+    }
+  }
+}
