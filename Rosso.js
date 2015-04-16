@@ -1,4 +1,4 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var o;"undefined"!=typeof window?o=window:"undefined"!=typeof global?o=global:"undefined"!=typeof self&&(o=self),o.Rosso=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Rosso = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 var isArray = _dereq_('isarray');
 
 /**
@@ -509,9 +509,8 @@ Rosso.show = function(path) {
 	for(var i = 0; i < Rosso.routes.length; i++) {
 		var route = Rosso.routes[i]
 		if(route.match(ctx.path, ctx.params)) {
-			Rosso.loadPage(route.args, ctx, function(success) {
-				currentPage = route
-			})
+			currentPage = route
+			Rosso.loadPage(route.args, ctx)
 			break
 		}
 	}
@@ -524,11 +523,11 @@ Rosso.show = function(path) {
  *
  * @param {Object} args
  * @param {Context} ctx
- * @param {Function} endCallback(success)
+ * @param {Function} done(error)
  * @api private
  */
 
-Rosso.loadPage = function(args, ctx, endCallback) {
+Rosso.loadPage = function(args, ctx, done) {
 	// Using slice to copy the array without referencing it
 	var callbacks = args.middlewares ? args.middlewares.slice() : []
 	
@@ -580,7 +579,8 @@ Rosso.loadPage = function(args, ctx, endCallback) {
 	// next(error): the callback to continue with the following middleware. Pass any value that casts to true to interrput the cycle
 	var next = function(error) {
 		if(error) {
-			return endCallback(false)
+			if(done) done(true)
+			return
 		}
 		
 		var cb = callbacks.shift()
@@ -595,7 +595,8 @@ Rosso.loadPage = function(args, ctx, endCallback) {
 			cb(ctx, next)
 		}
 		else {
-			endCallback(true)
+			if(done) done(false)
+			return
 		}
 	}
 	next()

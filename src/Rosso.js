@@ -253,9 +253,8 @@ Rosso.show = function(path) {
 	for(var i = 0; i < Rosso.routes.length; i++) {
 		var route = Rosso.routes[i]
 		if(route.match(ctx.path, ctx.params)) {
-			Rosso.loadPage(route.args, ctx, function(success) {
-				currentPage = route
-			})
+			currentPage = route
+			Rosso.loadPage(route.args, ctx)
 			break
 		}
 	}
@@ -268,11 +267,11 @@ Rosso.show = function(path) {
  *
  * @param {Object} args
  * @param {Context} ctx
- * @param {Function} endCallback(success)
+ * @param {Function} done(error)
  * @api private
  */
 
-Rosso.loadPage = function(args, ctx, endCallback) {
+Rosso.loadPage = function(args, ctx, done) {
 	// Using slice to copy the array without referencing it
 	var callbacks = args.middlewares ? args.middlewares.slice() : []
 	
@@ -324,7 +323,8 @@ Rosso.loadPage = function(args, ctx, endCallback) {
 	// next(error): the callback to continue with the following middleware. Pass any value that casts to true to interrput the cycle
 	var next = function(error) {
 		if(error) {
-			return endCallback(false)
+			if(done) done(true)
+			return
 		}
 		
 		var cb = callbacks.shift()
@@ -339,7 +339,8 @@ Rosso.loadPage = function(args, ctx, endCallback) {
 			cb(ctx, next)
 		}
 		else {
-			endCallback(true)
+			if(done) done(false)
+			return
 		}
 	}
 	next()
