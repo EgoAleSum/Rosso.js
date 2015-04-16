@@ -1,6 +1,6 @@
 # History
 
-## [0.2.6](https://github.com/EgoAleSum/Rosso.js/tree/master) (unreleased)
+## [0.2.5](https://github.com/EgoAleSum/Rosso.js/releases/tag/0.2.6) (16-04-2015)
 
 - Fixed: `currentPage` was set only in a callback after route was created, and this broke `Rosso.currentPage()` in certain scenarios.
 - Fixed: Added "dev" mode to Gruntfile.
